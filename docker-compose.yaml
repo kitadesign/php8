@@ -1,0 +1,36 @@
+version: '3'
+services:
+  web:
+    container_name: web
+    build:
+      context: ./infra/nginx
+      dockerfile: ./Dockerfile
+    ports:
+      - 8888:80
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - app
+  app:
+    container_name: app
+    build:
+      context: ./infra/php
+      dockerfile: ./Dockerfile.dev
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - db
+  db:
+    container_name: db
+    build:
+      context: ./infra/mysql
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./infra/mysql/data:/var/lib/mysql
+    ports:
+      - 33060:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
